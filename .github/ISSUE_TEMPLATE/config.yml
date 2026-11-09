@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions and usage help
+    url: https://github.com/your-org/mcp-cloud-deploy/discussions
+    about: Ask setup and usage questions in GitHub Discussions.
+  - name: Security vulnerability
+    url: https://github.com/your-org/mcp-cloud-deploy/security/advisories/new
+    about: Report vulnerabilities privately instead of opening a public issue.

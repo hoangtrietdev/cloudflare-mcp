@@ -1,0 +1,57 @@
+{
+  "name": "mcp-cloud-deploy",
+  "version": "1.0.0",
+  "description": "A local-first MCP server for deploying static sites and SPAs to Cloudflare Pages.",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "bin": {
+    "mcp-cloud-deploy": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node scripts/set-bin-permissions.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "npm run build && node --test tests/*.test.mjs",
+    "start": "node dist/index.js",
+    "prepack": "npm run build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "blake3-wasm": "^2.1.5",
+    "dotenv": "^16.4.7",
+    "mime-types": "^3.0.2",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/mime-types": "^3.0.1",
+    "@types/node": "^22.13.4",
+    "typescript": "^5.7.3"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "cloudflare-pages",
+    "deployment",
+    "typescript",
+    "developer-tools"
+  ],
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "CONTRIBUTING.md",
+    "SECURITY.md",
+    "claude_desktop_config.json"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OWNER/REPO.git"
+  },
+  "bugs": {
+    "url": "https://github.com/OWNER/REPO/issues"
+  },
+  "homepage": "https://github.com/OWNER/REPO#readme"
+}

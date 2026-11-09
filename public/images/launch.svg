@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 520" role="img" aria-labelledby="title desc">
+  <title id="title">Local build deployed to a global edge</title>
+  <desc id="desc">A glowing page card connects to distributed edge nodes around the world.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#1e3550"/><stop offset="1" stop-color="#121d2b"/></linearGradient>
+    <linearGradient id="glow" x1="0" x2="1"><stop stop-color="#f8d66d"/><stop offset="1" stop-color="#f28e55"/></linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="18" stdDeviation="20" flood-color="#000" flood-opacity=".32"/></filter>
+  </defs>
+  <rect width="960" height="520" rx="34" fill="url(#bg)"/>
+  <g fill="none" stroke="#7ea8cc" stroke-opacity=".34" stroke-width="2">
+    <path d="M480 253 190 116M480 253 770 116M480 253 175 394M480 253 785 394M480 253 480 78M480 253 480 448"/>
+    <circle cx="480" cy="253" r="188" stroke-dasharray="5 12"/>
+  </g>
+  <g fill="#81a9cd"><circle cx="190" cy="116" r="10"/><circle cx="770" cy="116" r="10"/><circle cx="175" cy="394" r="10"/><circle cx="785" cy="394" r="10"/><circle cx="480" cy="78" r="10"/><circle cx="480" cy="448" r="10"/></g>
+  <g filter="url(#shadow)"><rect x="330" y="170" width="300" height="170" rx="18" fill="#f7f9fc"/><rect x="330" y="170" width="300" height="38" rx="18" fill="#e9eef4"/><circle cx="352" cy="189" r="5" fill="#f28e55"/><circle cx="370" cy="189" r="5" fill="#f8d66d"/><circle cx="388" cy="189" r="5" fill="#58cba0"/><rect x="360" y="232" width="132" height="10" rx="5" fill="#21344a"/><rect x="360" y="253" width="205" height="7" rx="3.5" fill="#b5c1cf"/><rect x="360" y="268" width="175" height="7" rx="3.5" fill="#d1d9e2"/><rect x="360" y="293" width="88" height="25" rx="12" fill="url(#glow)"/></g>
+  <circle cx="480" cy="253" r="212" fill="none" stroke="url(#glow)" stroke-opacity=".28" stroke-width="2"/>
+</svg>

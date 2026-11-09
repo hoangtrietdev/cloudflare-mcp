@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "mcp-cloud-deploy": {
+      "command": "node",
+      "args": ["/absolute/path/to/mcp-cloud-deploy/dist/index.js"],
+      "env": {
+        "CLOUDFLARE_API_TOKEN": "replace-with-your-token",
+        "CLOUDFLARE_ACCOUNT_ID": "replace-with-your-account-id"
+      }
+    }
+  }
+}

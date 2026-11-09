@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 320" role="img" aria-labelledby="title">
+  <title id="title">Images and assets kept together</title>
+  <defs><linearGradient id="a" x2="1" y2="1"><stop stop-color="#243e59"/><stop offset="1" stop-color="#141f2e"/></linearGradient></defs>
+  <rect width="480" height="320" rx="28" fill="url(#a)"/>
+  <rect x="80" y="76" width="155" height="168" rx="14" fill="#f6bd74" transform="rotate(-8 80 76)" opacity=".9"/>
+  <rect x="170" y="58" width="155" height="180" rx="14" fill="#93bde0" transform="rotate(7 170 58)" opacity=".9"/>
+  <rect x="232" y="88" width="155" height="168" rx="14" fill="#f7f9fc" transform="rotate(-3 232 88)"/>
+  <circle cx="300" cy="150" r="32" fill="#59cba1"/><path d="m256 225 35-38 25 24 22-28 37 42" fill="none" stroke="#243e59" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

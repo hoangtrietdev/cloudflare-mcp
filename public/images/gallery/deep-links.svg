@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 320" role="img" aria-labelledby="title">
+  <title id="title">Single-page app links work on refresh</title>
+  <rect width="480" height="320" rx="28" fill="#172638"/>
+  <rect x="70" y="65" width="340" height="190" rx="18" fill="#f7f9fc"/>
+  <rect x="70" y="65" width="340" height="42" rx="18" fill="#e9eef4"/>
+  <circle cx="95" cy="86" r="6" fill="#f28e55"/><circle cx="115" cy="86" r="6" fill="#f8d66d"/><circle cx="135" cy="86" r="6" fill="#58cba0"/>
+  <rect x="100" y="133" width="200" height="28" rx="14" fill="#e5edf5"/>
+  <text x="118" y="152" fill="#39536d" font-family="monospace" font-size="13">/store/products</text>
+  <path d="m110 202 22 22 46-51" fill="none" stroke="#45b98d" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="195" y="218" fill="#22364b" font-family="system-ui,sans-serif" font-size="18" font-weight="700">Direct links work</text>
+</svg>
