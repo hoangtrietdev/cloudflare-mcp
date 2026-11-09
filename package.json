@@ -44,7 +44,11 @@
     "CHANGELOG.md",
     "CONTRIBUTING.md",
     "SECURITY.md",
-    "claude_desktop_config.json"
+    ".env.example",
+    "claude_desktop_config.json",
+    "examples/README.md",
+    "examples/configs/",
+    "scripts/start-local.mjs"
   ],
   "repository": {
     "type": "git",

@@ -1,6 +1,6 @@
 # Example requests
 
-Use these as prompts in Claude Desktop, Cursor, or another connected MCP host. The host should ask for the build directory if you have not provided one.
+Use these prompts in Codex, VS Code, Claude Desktop, JetBrains AI Assistant, or another connected MCP host. The host should ask for the build directory if you have not provided one. Host setup examples are in [`configs/`](configs/).
 
 ## Image-heavy static landing page, no domain
 

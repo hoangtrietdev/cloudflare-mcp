@@ -4,6 +4,8 @@
 
 Repository: [hoangtrietdev/cloudflare-mcp](https://github.com/hoangtrietdev/cloudflare-mcp) · npm package name: `mcp-cloud-deploy` (first release pending).
 
+**Live demo:** [mcp-cloud-deploy-demo.pages.dev](https://mcp-cloud-deploy-demo.pages.dev) · **Quick setup:** [Install and configure](#install-and-configure).
+
 A local-first [Model Context Protocol](https://modelcontextprotocol.io/) server that deploys built websites to Cloudflare Pages. Ask your MCP host to publish a static site, a React single-page app, or attach a domain you already own.
 
 > Your site files are read on your machine and sent directly to Cloudflare Pages. This server does not proxy or store your project files.
@@ -16,7 +18,7 @@ A local-first [Model Context Protocol](https://modelcontextprotocol.io/) server 
 - Optional custom-domain binding and CNAME creation for zones in your Cloudflare account.
 - Actionable DNS instructions when the domain is hosted elsewhere.
 - Recent deployment and domain status reporting.
-- Stdio transport for Claude Desktop, Cursor, and other MCP clients.
+- Stdio transport with setup examples for Codex, VS Code, Claude Desktop, and JetBrains AI Assistant.
 - Secrets loaded locally from environment variables or `.env`; diagnostics go to stderr.
 
 ## Requirements
@@ -30,67 +32,57 @@ Use a narrowly scoped token. Never commit `.env` or paste a token into an issue.
 
 ## Install and configure
 
+Clone and build the server locally:
+
 ```bash
-npm install
+git clone https://github.com/hoangtrietdev/cloudflare-mcp.git
+cd cloudflare-mcp
+npm ci
 cp .env.example .env
 ```
 
-Edit `.env` locally:
+Add your credentials to `.env`:
 
 ```dotenv
 CLOUDFLARE_API_TOKEN=your_cloudflare_api_token
 CLOUDFLARE_ACCOUNT_ID=your_cloudflare_account_id
 ```
 
-Then build:
+Then build the local server:
 
 ```bash
 npm run build
 ```
 
-The `.env` file is ignored by Git. The process environment takes precedence over `.env` values.
+The local launcher changes into the repository before starting the server, so `dotenv` finds this `.env` regardless of which app launched the process. `.env` is ignored by Git. Never add credentials to a committed config or issue.
 
 ## Connect an MCP host
 
+All four clients can run the same local stdio server. Replace `/absolute/path/to/cloudflare-mcp` in a sample with the path where you cloned this repository. The configuration examples are in [`examples/configs/`](examples/configs/).
+
+### OpenAI Codex
+
+Add the contents of [`examples/configs/codex.toml`](examples/configs/codex.toml) to `~/.codex/config.toml`. Restart Codex or reload its MCP servers. The config points to `scripts/start-local.mjs`, which loads the repository's local `.env`.
+
+### Visual Studio Code
+
+Create `.vscode/mcp.json` in your workspace using [`examples/configs/vscode.mcp.json`](examples/configs/vscode.mcp.json). In VS Code, run **MCP: List Servers** from the Command Palette to start or inspect the server. The file uses VS Code's `servers` format and `envFile` support.
+
 ### Claude Desktop
 
-Add this server to Claude Desktop's MCP configuration. Replace the script path with the absolute path to this checkout. Put credentials in `env` or use the local `.env` file when the host starts the process with this project directory as its working directory.
+Merge [`examples/configs/claude_desktop.json`](examples/configs/claude_desktop.json) into Claude Desktop's `claude_desktop_config.json`. Common locations:
 
-```json
-{
-  "mcpServers": {
-    "mcp-cloud-deploy": {
-      "command": "node",
-      "args": ["/absolute/path/to/mcp-cloud-deploy/dist/index.js"],
-      "env": {
-        "CLOUDFLARE_API_TOKEN": "your_cloudflare_api_token",
-        "CLOUDFLARE_ACCOUNT_ID": "your_cloudflare_account_id"
-      }
-    }
-  }
-}
-```
+- macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- Windows: `%APPDATA%\Claude\claude_desktop_config.json`
+- Linux: `$XDG_CONFIG_HOME/Claude/claude_desktop_config.json` or `~/.config/Claude/claude_desktop_config.json`
 
-An equivalent example is in [`claude_desktop_config.json`](claude_desktop_config.json). Restart Claude Desktop after changing its MCP configuration.
+Restart Claude Desktop after saving.
 
-### Cursor
+### JetBrains AI Assistant
 
-Add the built server to Cursor's MCP configuration:
+Open **Settings → Tools → AI Assistant → Model Context Protocol (MCP)**, add an MCP server, and paste [`examples/configs/jetbrains.json`](examples/configs/jetbrains.json). Set the working directory to your repository root if the IDE asks for it, then apply and enable the server. JetBrains can also import the same server from the Claude Desktop config.
 
-```json
-{
-  "mcpServers": {
-    "mcp-cloud-deploy": {
-      "command": "node",
-      "args": ["/absolute/path/to/mcp-cloud-deploy/dist/index.js"],
-      "env": {
-        "CLOUDFLARE_API_TOKEN": "your_cloudflare_api_token",
-        "CLOUDFLARE_ACCOUNT_ID": "your_cloudflare_account_id"
-      }
-    }
-  }
-}
-```
+> JetBrains AI Assistant can connect to this deployment server as an MCP client. JetBrains IDEs can separately expose their own IDE context through a built-in MCP server; that is a different direction of connection.
 
 ## Tools
 

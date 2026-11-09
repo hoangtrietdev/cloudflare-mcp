@@ -1,0 +1,7 @@
+# Add this section to ~/.codex/config.toml.
+# Replace /absolute/path/to/cloudflare-mcp with the repository checkout path.
+[mcp_servers.mcp_cloud_deploy]
+command = "node"
+args = ["/absolute/path/to/cloudflare-mcp/scripts/start-local.mjs"]
+cwd = "/absolute/path/to/cloudflare-mcp"
+startup_timeout_sec = 30

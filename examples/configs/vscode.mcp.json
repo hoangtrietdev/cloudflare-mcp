@@ -1,0 +1,11 @@
+{
+  "servers": {
+    "mcp-cloud-deploy": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["/absolute/path/to/cloudflare-mcp/scripts/start-local.mjs"],
+      "cwd": "/absolute/path/to/cloudflare-mcp",
+      "envFile": "/absolute/path/to/cloudflare-mcp/.env"
+    }
+  }
+}

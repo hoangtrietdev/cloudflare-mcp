@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "mcp-cloud-deploy": {
+      "command": "node",
+      "args": ["/absolute/path/to/cloudflare-mcp/scripts/start-local.mjs"]
+    }
+  }
+}

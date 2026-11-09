@@ -7,7 +7,7 @@ test('starts over stdio and exposes the three deployment tools', async () => {
   const client = new Client({ name: 'mcp-cloud-deploy-smoke-test', version: '1.0.0' });
   const transport = new StdioClientTransport({
     command: process.execPath,
-    args: ['dist/index.js'],
+    args: ['scripts/start-local.mjs'],
     env: {
       ...process.env,
       CLOUDFLARE_API_TOKEN: 'smoke-test-token',
