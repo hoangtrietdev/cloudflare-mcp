@@ -1,19 +1,23 @@
 # Release process
 
-Releases are published to npm when a GitHub Release is published.
+The package name is `mcp-cloud-deploy`. The first version has not been published to npm yet. The repository is [hoangtrietdev/cloudflare-mcp](https://github.com/hoangtrietdev/cloudflare-mcp), and the package name currently has no published version.
 
-## Repository setup
+## One-time npm setup
 
-Before the first release:
+npm requires a package to exist before a Trusted Publisher can be configured. Bootstrap the first release from a maintainer workstation:
 
-1. Replace `OWNER/REPO` placeholders in `package.json`, the README badges, and issue-template contact links.
-2. Create the npm package and configure npm Trusted Publishing for this GitHub repository and `.github/workflows/release.yml`.
-3. Confirm the npm package name is available and that the publisher configuration grants the workflow publish access.
-4. Ensure CI passes on the release commit.
+1. Confirm the public GitHub repository and package metadata are correct.
+2. From this checkout, run `npm publish --access public` while signed in to the npm account that will own the package. npm may require account 2FA. This first publication creates the package; do not put an npm token in the repository or GitHub Actions.
+3. In npm package settings, configure a GitHub Actions Trusted Publisher with:
+   - GitHub user or organization: `hoangtrietdev`
+   - Repository: `cloudflare-mcp`
+   - Workflow file: `release.yml`
+   - Allow direct `npm publish`
+4. Complete the first successful trusted publish within two days of creating the npm publisher configuration, or npm expires that configuration.
 
-No long-lived npm token is stored in GitHub Actions; the workflow requests a short-lived OIDC token for provenance publishing.
+After the package exists and the publisher is configured, the workflow uses OIDC and does not require a long-lived npm token. Public GitHub visibility is required for npm provenance.
 
-## Publish
+## Publish subsequent versions
 
 1. Update `version` in `package.json` and `package-lock.json` using semantic versioning.
 2. Move the corresponding notes from `Unreleased` in `CHANGELOG.md` into a versioned section.

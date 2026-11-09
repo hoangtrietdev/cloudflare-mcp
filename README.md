@@ -1,6 +1,8 @@
 # mcp-cloud-deploy
 
-[![CI](https://github.com/OWNER/REPO/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/REPO/actions/workflows/ci.yml) [![npm version](https://img.shields.io/npm/v/mcp-cloud-deploy)](https://www.npmjs.com/package/mcp-cloud-deploy) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![CI](https://github.com/hoangtrietdev/cloudflare-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/hoangtrietdev/cloudflare-mcp/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
+Repository: [hoangtrietdev/cloudflare-mcp](https://github.com/hoangtrietdev/cloudflare-mcp) · npm package name: `mcp-cloud-deploy` (first release pending).
 
 A local-first [Model Context Protocol](https://modelcontextprotocol.io/) server that deploys built websites to Cloudflare Pages. Ask your MCP host to publish a static site, a React single-page app, or attach a domain you already own.
 
@@ -170,5 +172,3 @@ Bug reports, fixes, and feature proposals are welcome. Read [CONTRIBUTING.md](CO
 ## License
 
 MIT. See [LICENSE](LICENSE).
-
-Before publishing this checkout to GitHub/npm, replace the `OWNER/REPO` placeholders in the repository metadata, issue links, and CI badge with the actual GitHub repository.

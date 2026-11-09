@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
   - name: Questions and usage help
-    url: https://github.com/your-org/mcp-cloud-deploy/discussions
-    about: Ask setup and usage questions in GitHub Discussions.
+    url: https://github.com/hoangtrietdev/cloudflare-mcp/issues
+    about: Browse or open a usage question in the repository issue tracker.
   - name: Security vulnerability
-    url: https://github.com/your-org/mcp-cloud-deploy/security/advisories/new
+    url: https://github.com/hoangtrietdev/cloudflare-mcp/security/advisories/new
     about: Report vulnerabilities privately instead of opening a public issue.
