@@ -1,25 +1,25 @@
 # Privacy policy
 
-`mcp-cloud-deploy` is an open-source tool. This policy describes the hosted MCP Worker when operated by the project maintainer; self-hosters operate their own instance and control its data.
+This policy covers the hosted MCP service when operated by the project maintainer. For a self-hosted deployment, the operator controls the service and its data.
 
-## Data the hosted service handles
+## Data handled by the hosted service
 
-- OAuth connection metadata needed to connect an MCP client.
-- The Cloudflare Account ID and API Token that you submit on the HTTPS consent page.
-- GitHub public repository URLs, selected branches and deployment requests sent to its tools.
+- OAuth client metadata and authorization grants needed to connect an MCP client.
+- Your Cloudflare Account ID and API Token entered on the HTTPS consent page.
+- Public GitHub repository URL, branch, and deployment requests submitted to MCP tools.
 
-The OAuth provider stores authorization grants and connection properties in Cloudflare Workers KV. Cloudflare's OAuth provider encrypts stored props; the Worker uses your token to call Cloudflare APIs. Tokens are not included in tool responses or application logs. The service does not request or store website source archives after a request completes. Cloudflare Pages receives the deployed files.
+## How credentials are protected and used
 
-## Use and disclosure
+The service validates your Cloudflare API Token and uses it only for the Cloudflare Pages, DNS, and deployment operations you request. Before credentials are written to Upstash Redis, the app encrypts them with AES-256-GCM using the operator-managed `MCP_CREDENTIALS_ENCRYPTION_KEY`. Redis stores OAuth grants and hashed access/refresh token indexes. Access tokens expire after one hour; refresh grants expire after 30 days and are rotated on use. Revoke the MCP authorization to delete a grant, or revoke the Cloudflare API Token in your Cloudflare dashboard to invalidate the upstream credential immediately.
 
-Credentials are used only to validate your Cloudflare access and perform the requested Pages, DNS, and deployment-status operations. They are not sold or shared with analytics or advertising services. The Worker fetches hosted build assets only from public GitHub archives (`api.github.com` and `codeload.github.com`).
+Tokens are not included in MCP tool responses or application logs. The app fetches public build archives only from GitHub (`api.github.com` and `codeload.github.com`), processes them in a request, and sends static assets to Cloudflare Pages. It does not run repository build scripts.
 
-## Retention and revocation
+## Third-party processors and retention
 
-OAuth grants remain in the configured Cloudflare KV namespace until revoked or removed by the operator. Disconnect/revoke the MCP authorization to remove the grant. Also revoke the API Token in the Cloudflare dashboard to invalidate the underlying credential immediately. Deployments and DNS changes remain in your Cloudflare account under Cloudflare's own retention policies.
+Vercel hosts the application; Upstash stores encrypted OAuth data. Cloudflare processes the requested account changes and retains deployments/DNS records under its own policies. OAuth records remain until revoked or their 30-day refresh TTL expires. Public source archives are not intentionally retained after deployment requests complete.
 
-## Security and contact
+## Your choices and security
 
-Use a dedicated API Token with the minimum required account and zone permissions. Do not use a Global API Key. The project maintainer cannot see your token in MCP tool outputs, but the hosted Worker must process it to provide the service. Do not connect if you do not trust the operator. Report security issues privately as described in [SECURITY.md](SECURITY.md).
+Use a dedicated Cloudflare API Token with minimum account/zone permissions. Never use a Global API Key. Connecting means the hosted service operator processes the token you submit; do not connect if you do not trust the operator. For a self-hosted version, use your own Vercel project, Redis database, and encryption key.
 
-For a self-hosted installation, review the source and configure your own Worker, KV namespace, and privacy notice.
+Report vulnerabilities as described in [SECURITY.md](SECURITY.md). This project does not sell data or use advertising analytics.

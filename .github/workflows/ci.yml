@@ -37,9 +37,6 @@ jobs:
       - name: Audit production dependencies
         if: matrix.node-version == 22
         run: npm audit --omit=dev
-      - name: Type check hosted Worker
+      - name: Build hosted Vercel app
         if: matrix.node-version == 22
-        run: npx tsc -p tsconfig.remote.json
-      - name: Validate hosted Worker bundle
-        if: matrix.node-version == 22
-        run: npx wrangler deploy --config remote/wrangler.jsonc --dry-run --outdir /tmp/mcp-cloud-deploy-worker
+        run: npm run build:vercel

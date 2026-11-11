@@ -1,0 +1,14 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "buildCommand": "npm run build:vercel",
+  "regions": ["cdg1"],
+  "rewrites": [
+    { "source": "/.well-known/oauth-authorization-server", "destination": "/oauth/metadata" },
+    { "source": "/.well-known/oauth-protected-resource/api/mcp", "destination": "/oauth/resource" }
+  ],
+  "functions": {
+    "app/api/mcp/route.ts": { "maxDuration": 300 },
+    "app/oauth/**/*.ts": { "maxDuration": 30 }
+  }
+}
