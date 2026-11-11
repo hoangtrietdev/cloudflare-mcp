@@ -2,37 +2,42 @@
 
 [![CI](https://github.com/hoangtrietdev/cloudflare-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/hoangtrietdev/cloudflare-mcp/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-Repository: [hoangtrietdev/cloudflare-mcp](https://github.com/hoangtrietdev/cloudflare-mcp) · npm package name: `mcp-cloud-deploy` (first release pending).
+Deploy static websites to Cloudflare Pages from Codex, VS Code, Claude Desktop, and JetBrains AI Assistant. Choose the hosted MCP endpoint for a ready-made connection, or run the stdio server locally for local folders and private repositories.
 
-**Live demo:** [mcp-cloud-deploy-demo.pages.dev](https://mcp-cloud-deploy-demo.pages.dev) · **Quick setup:** [Install and configure](#install-and-configure).
+**User setup guide:** [mcp-cloud-deploy-demo.pages.dev](https://mcp-cloud-deploy-demo.pages.dev/) · **Developer documentation:** [Developer Docs](https://mcp-cloud-deploy-demo.pages.dev/developer/) · **Privacy:** [PRIVACY.md](PRIVACY.md)
 
-A local-first [Model Context Protocol](https://modelcontextprotocol.io/) server that deploys built websites to Cloudflare Pages. Ask your MCP host to publish a static site, a React single-page app, or attach a domain you already own.
+> Hosted availability: this repository includes the remote Worker implementation and a manual deployment workflow. The maintainer must deploy it and publish its real `/mcp` URL before the hosted connector is available. Until then, use local stdio mode.
 
-> Your site files are read on your machine and sent directly to Cloudflare Pages. This server does not proxy or store your project files.
+## Choose how to connect
 
-## Features
+| Mode | Use it when | Source supported |
+| --- | --- | --- |
+| Hosted Streamable HTTP | You want to configure one remote MCP URL | Public GitHub repository that already contains static build output |
+| Local stdio | Your build is on your computer, repository is private, or you need to build locally | Local static output such as `./dist` or `./build` |
 
-- Direct upload of static build directories, including nested images, fonts, JavaScript, and CSS.
-- Cloudflare Pages project creation when the requested project does not exist.
-- Optional React/Vite single-page application fallback for client-side routes.
-- Optional custom-domain binding and CNAME creation for zones in your Cloudflare account.
-- Actionable DNS instructions when the domain is hosted elsewhere.
-- Recent deployment and domain status reporting.
-- Stdio transport with setup examples for Codex, VS Code, Claude Desktop, and JetBrains AI Assistant.
-- Secrets loaded locally from environment variables or `.env`; diagnostics go to stderr.
+Both modes provide `deploy_to_cloudflare_pages`, `attach_custom_domain`, and `list_deployments`. A Cloudflare Pages URL works without buying a domain. The tool does not purchase domains or run server-side applications.
 
-## Requirements
+## Hosted MCP setup (operator)
 
-- Node.js 18 or newer.
-- A Cloudflare account.
-- A Cloudflare API token with **Pages Write**. For automatic DNS changes, also grant **Zone:Read** and **DNS:Edit** for the relevant zones.
-- The Cloudflare account ID that owns your Pages project and DNS zones.
+The hosted Worker uses Cloudflare OAuth. Each user enters their own Cloudflare Account ID and API Token over HTTPS on the consent page. The Worker stores OAuth connection properties in Cloudflare KV and uses the credential only for the requested Cloudflare operations. Read [PRIVACY.md](PRIVACY.md) before operating the hosted service.
 
-Use a narrowly scoped token. Never commit `.env` or paste a token into an issue. See [Security](SECURITY.md) for reporting vulnerabilities.
+1. Create a Cloudflare API token for Worker deployment with the account permissions required to deploy Workers and manage Workers KV. Set `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` as GitHub Actions repository secrets. This is the **operator deployment token**, distinct from users' tokens.
+2. Create an OAuth KV namespace: `npx wrangler kv namespace create OAUTH_KV`. Save its ID as the GitHub Actions secret `CLOUDFLARE_KV_NAMESPACE_ID`.
+3. In GitHub, open **Actions → Deploy hosted MCP Worker → Run workflow**. The workflow creates a temporary Wrangler config containing the KV ID, deploys the Worker, and removes that config afterward.
+4. Copy the resulting Worker URL and append `/mcp`, for example `https://mcp-cloud-deploy-server.<account-subdomain>.workers.dev/mcp`.
+5. Replace the endpoint constant in `public/index.html` with this real URL and publish the website to Cloudflare Pages.
 
-## Install and configure
+For a manual deployment, see [Developer Docs](https://mcp-cloud-deploy-demo.pages.dev/developer/#hosted). Do not commit API tokens or generated Wrangler configs.
 
-Clone and build the server locally:
+### Connect a hosted MCP client
+
+Use the published endpoint in your MCP client. The consent page asks for your Cloudflare Account ID and a dedicated API Token. Grant **Account → Cloudflare Pages → Edit** to deploy. Add **Zone → Zone → Read** and **Zone → DNS → Edit** only if you want automatic DNS changes. Limit these permissions to the relevant account/zones. Never use your Global API Key.
+
+Example configs are available on the landing page and in `examples/configs/`. Claude Desktop's remote connector is added from **Settings → Connectors**. Codex, VS Code and JetBrains accept Streamable HTTP endpoint configuration.
+
+## Local install (stdio)
+
+Requirements: Node.js 18+, a Cloudflare account, and a scoped Cloudflare API Token.
 
 ```bash
 git clone https://github.com/hoangtrietdev/cloudflare-mcp.git
@@ -41,100 +46,34 @@ npm ci
 cp .env.example .env
 ```
 
-Add your credentials to `.env`:
+Add credentials to the ignored `.env` file:
 
 ```dotenv
 CLOUDFLARE_API_TOKEN=your_cloudflare_api_token
 CLOUDFLARE_ACCOUNT_ID=your_cloudflare_account_id
 ```
 
-Then build the local server:
+Build the package with `npm run build`. MCP client configuration samples are in [`examples/configs/`](examples/configs/). They launch `scripts/start-local.mjs`, which loads `.env` from the repository and starts the stdio server. Do not configure credentials in a committed client config.
 
-```bash
-npm run build
-```
+The local tool accepts `dir_path` such as `./dist`, `./build`, or `./out`; the directory must contain `index.html`. All nested static assets are uploaded with content types. Set `spa_mode: true` for a React/Vite single-page app that requires client-side route fallback.
 
-The local launcher changes into the repository before starting the server, so `dotenv` finds this `.env` regardless of which app launched the process. `.env` is ignored by Git. Never add credentials to a committed config or issue.
-
-## Connect an MCP host
-
-All four clients can run the same local stdio server. Replace `/absolute/path/to/cloudflare-mcp` in a sample with the path where you cloned this repository. The configuration examples are in [`examples/configs/`](examples/configs/).
-
-### OpenAI Codex
-
-Add the contents of [`examples/configs/codex.toml`](examples/configs/codex.toml) to `~/.codex/config.toml`. Restart Codex or reload its MCP servers. The config points to `scripts/start-local.mjs`, which loads the repository's local `.env`.
-
-### Visual Studio Code
-
-Create `.vscode/mcp.json` in your workspace using [`examples/configs/vscode.mcp.json`](examples/configs/vscode.mcp.json). In VS Code, run **MCP: List Servers** from the Command Palette to start or inspect the server. The file uses VS Code's `servers` format and `envFile` support.
-
-### Claude Desktop
-
-Merge [`examples/configs/claude_desktop.json`](examples/configs/claude_desktop.json) into Claude Desktop's `claude_desktop_config.json`. Common locations:
-
-- macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
-- Windows: `%APPDATA%\Claude\claude_desktop_config.json`
-- Linux: `$XDG_CONFIG_HOME/Claude/claude_desktop_config.json` or `~/.config/Claude/claude_desktop_config.json`
-
-Restart Claude Desktop after saving.
-
-### JetBrains AI Assistant
-
-Open **Settings → Tools → AI Assistant → Model Context Protocol (MCP)**, add an MCP server, and paste [`examples/configs/jetbrains.json`](examples/configs/jetbrains.json). Set the working directory to your repository root if the IDE asks for it, then apply and enable the server. JetBrains can also import the same server from the Claude Desktop config.
-
-> JetBrains AI Assistant can connect to this deployment server as an MCP client. JetBrains IDEs can separately expose their own IDE context through a built-in MCP server; that is a different direction of connection.
-
-## Tools
+## Cloudflare Pages tools
 
 ### `deploy_to_cloudflare_pages`
 
-Deploys a local build directory containing `index.html`. It walks nested folders and uploads files with their content types, so image-heavy landing pages and static build output are supported.
-
-Inputs:
-
-- `project_name` (required): Cloudflare Pages project name, lowercase letters, numbers, and hyphens. For a request like “deploy my website named mystoreabc,” use `mystoreabc`.
-- `dir_path` (required): Build output path, such as `./dist`, `./build`, or `./out`.
-- `branch` (optional): Deployment branch; defaults to `main`.
-- `spa_mode` (optional): Set `true` for React/Vite apps that use client-side history routes. This adds the Pages fallback `/* /index.html 200`. Leave it off for traditional multi-page sites.
-- `domain` (optional): A domain you already own, such as `www.example.com`. It is attached after the deployment. Omit it if you do not have a domain; the tool returns a Pages deployment URL you can use immediately.
-
-Examples of the intended conversation:
-
-> “Deploy my website named mystoreabc from `./dist`. I don't have a domain.”
-
-The host should deploy the files and give you the generated `pages.dev` URL. You do not need to buy a domain first.
-
-> “Deploy my React app named mystoreabc from `./dist`, enable SPA routing, and attach `www.example.com`.”
-
-The host should set `spa_mode: true`, deploy, then bind the domain and report DNS and SSL status. If your DNS zone is outside this Cloudflare account, the tool gives the CNAME target to add at that provider.
+Creates a Pages project when needed and deploys a static build. Local stdio accepts `project_name`, `dir_path`, `branch`, optional `spa_mode`, and optional `domain`. Hosted mode accepts `project_name`, `repo_url`, `branch`, `output_dir`, and optional `spa_mode`; its GitHub repository must be public and already contain the build output. The hosted Worker never executes repository scripts.
 
 ### `attach_custom_domain`
 
-Adds a custom domain to an existing Pages project. If the matching DNS zone is in this Cloudflare account, the tool creates a proxied CNAME only when there is no conflicting record. Existing DNS records are not overwritten. If the zone is hosted externally, it returns the record to create there.
+Attaches an owned domain to a Pages project. If its DNS zone is in the authorized Cloudflare account, the tool creates a proxied CNAME only when there is no conflicting record. Existing records are left unchanged. Otherwise, the tool returns the exact CNAME details for the current DNS provider. DNS and TLS propagation can take time.
 
 ### `list_deployments`
 
-Lists recent deployment URLs and statuses alongside configured custom domains.
+Returns recent deployment statuses, live URLs, and custom-domain bindings.
 
-## Site compatibility
+### Application limits
 
-- **Static landing pages:** Point `dir_path` at the built output. Keep images and other assets under that directory so their relative paths are preserved.
-- **React/Vite SPA:** Point at the generated build directory, usually `dist`, and set `spa_mode: true` when the app uses client-side history routing.
-- **Server-rendered or server-dependent apps:** This tool deploys static output only. Build/export a static version first; it does not deploy a Node.js server or server-side rendering runtime.
-- **Large builds:** Cloudflare Pages limits individual asset size and total file count. The tool returns a clear error when an individual file exceeds 25 MiB or the manifest exceeds 20,000 files.
-
-## Custom domains and DNS
-
-A custom domain is optional. Without one, use the `pages.dev` deployment URL. The server cannot register or purchase a domain for you.
-
-When you provide a domain, the server:
-
-1. Adds the hostname to the Pages project.
-2. Finds the longest matching DNS zone in the configured Cloudflare account.
-3. Creates a proxied CNAME to `<project-name>.pages.dev` if there is no conflicting record.
-4. Reports the Pages binding and certificate status.
-
-If DNS is hosted outside this account, add the CNAME shown by the tool at your DNS provider. DNS propagation and certificate issuance may take time. Existing conflicting records are left untouched and reported for manual review.
+This project deploys static output, not a Node server or server-side rendered app. Hosted GitHub archive limits are 20 MiB compressed, 50 MiB extracted, 10 MiB per file, and 20,000 files. For private repositories, local builds, or larger inputs, use stdio mode.
 
 ## Development
 
@@ -143,23 +82,18 @@ npm ci
 npm run build
 npm run typecheck
 npm test
-npm audit --omit=dev
+npx tsc -p tsconfig.remote.json
+npx wrangler deploy --config remote/wrangler.jsonc --dry-run
 ```
 
-The test suite uses Node's built-in test runner. The GitHub Actions CI workflow runs build, type checking, tests, and a production dependency audit on Node.js 18, 20, and 22.
+CI validates the Node.js stdio package on Node 18, 20, and 22. Worker typechecking and the Wrangler dry-run use Node 22. Production Worker deployment is a separate manual workflow and does not run automatically for pull requests.
 
-## Troubleshooting
+## Security and support
 
-- **Missing credentials:** Confirm `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` are available to the server process.
-- **401/403 from Cloudflare:** Check token expiry and Pages/DNS permissions.
-- **Build directory error:** Build the app first and pass the output directory, not the source folder. It must contain `index.html`.
-- **Deep links return 404 in a React app:** Set `spa_mode: true` and redeploy.
-- **Custom domain does not resolve:** Check the reported DNS record at the authoritative DNS provider, then allow time for propagation and TLS certificate issuance.
-- **Tool output is missing or garbled:** MCP uses stdout for JSON-RPC; this server sends diagnostics to stderr. Do not add `console.log` calls to the server process.
-
-## Contributing
-
-Bug reports, fixes, and feature proposals are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md), use the issue templates, and submit changes through a pull request.
+- `.env`, API tokens, OAuth authorization headers, and generated deployment configs must never be committed.
+- Internal local-server diagnostics go to stderr so stdout remains available for MCP JSON-RPC.
+- Report vulnerabilities using [SECURITY.md](SECURITY.md); please do not publish secrets in issues.
+- Read [CONTRIBUTING.md](CONTRIBUTING.md), open an issue, or submit a pull request to contribute.
 
 ## License
 
