@@ -7,8 +7,10 @@ export type OAuthGrant = { id: string; clientId: string; credentials: string; sc
 
 let redisClient: Redis | undefined;
 function redis(): Redis {
-  if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) throw new Error('OAuth storage is not configured. Connect an Upstash Redis database to this Vercel project.');
-  return redisClient ??= Redis.fromEnv();
+  const url = process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_API_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN;
+  if (!url || !token) throw new Error('OAuth storage is not configured. Connect Upstash Redis and provide its REST URL and write token.');
+  return redisClient ??= new Redis({ url, token });
 }
 const secretKey = (): Buffer => {
   const value = process.env.MCP_CREDENTIALS_ENCRYPTION_KEY;

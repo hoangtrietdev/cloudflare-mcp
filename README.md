@@ -20,7 +20,7 @@ The service deploys static output, not a Node server or server-side rendered app
 The hosted app is a Next.js Node runtime using Vercel's `mcp-handler`, OAuth authorization code + PKCE, and Upstash Redis for grants and token rotation.
 
 1. Import `hoangtrietdev/cloudflare-mcp` as a new project in Vercel. Use the project root and Node.js 22.
-2. Add Upstash Redis from Vercel Marketplace and connect it to the project. The integration supplies `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`.
+2. Add Upstash Redis from Vercel Marketplace and connect it to the project. The hosted server accepts either `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` or the Marketplace names `KV_REST_API_URL` / `KV_REST_API_TOKEN`.
 3. Create a 32-byte encryption key: `openssl rand -base64 32`. Set it as the Vercel **Production** environment variable `MCP_CREDENTIALS_ENCRYPTION_KEY`, then redeploy.
 4. Wait for the production build to complete. The MCP endpoint is `https://<your-project>.vercel.app/api/mcp`.
 5. Put that endpoint into the landing page's `endpoint` constant before publishing its updated version. MCP clients use OAuth discovery and will open the Cloudflare consent page.
