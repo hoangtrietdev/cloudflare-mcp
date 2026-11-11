@@ -19,7 +19,9 @@ const cleanDomain = z.string().min(3).max(253).regex(/^(?=.{3,253}$)(?:[a-z0-9](
 function registerTools(server: McpServer, credentials: CloudflareCredentials) {
   const client = new CloudflareClient(credentials.apiToken, credentials.accountId);
   server.registerTool('deploy_to_cloudflare_pages', {
+    title: 'Deploy to Cloudflare Pages',
     description: 'Deploy prebuilt static assets from a public GitHub repository to Cloudflare Pages. Does not run repository scripts or build code.',
+    annotations: { readOnlyHint: false, destructiveHint: false, openWorldHint: true },
     inputSchema: { project_name: projectName, repo_url: z.string().url(), branch: z.string().min(1).max(100).default('main'), output_dir: z.string().default('.'), spa_mode: z.boolean().default(false) }
   }, async ({ project_name, repo_url, branch, output_dir, spa_mode }) => {
     let directory: string | undefined;
@@ -31,7 +33,9 @@ function registerTools(server: McpServer, credentials: CloudflareCredentials) {
     finally { if (directory) await rm(directory, { recursive: true, force: true }).catch(() => undefined); }
   });
   server.registerTool('attach_custom_domain', {
+    title: 'Attach a custom domain',
     description: 'Bind a custom domain to a Cloudflare Pages project, and create a CNAME if its DNS zone is in this Cloudflare account and there is no conflicting record.',
+    annotations: { readOnlyHint: false, destructiveHint: true, openWorldHint: true },
     inputSchema: { project_name: projectName, domain: cleanDomain }
   }, async ({ project_name, domain }) => {
     try {
@@ -40,7 +44,9 @@ function registerTools(server: McpServer, credentials: CloudflareCredentials) {
     } catch (error) { return { isError: true, content: [{ type: 'text', text: safeError(error) }] }; }
   });
   server.registerTool('list_deployments', {
+    title: 'List Pages deployments',
     description: 'List recent deployment status, live URLs, and custom domains for a Cloudflare Pages project.',
+    annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: true },
     inputSchema: { project_name: projectName }
   }, async ({ project_name }) => {
     try {

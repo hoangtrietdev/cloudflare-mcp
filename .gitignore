@@ -9,3 +9,5 @@ coverage/
 .wrangler/
 .next/
 *.tsbuildinfo
+__pycache__/
+*.py[cod]
