@@ -15,7 +15,7 @@ server.tool('deploy_to_cloudflare_pages', 'Deploy a static website to Cloudflare
   branch: z.string().min(1).max(100).default('main').describe('Deployment branch; defaults to main.'),
   spa_mode: z.boolean().default(false).describe('Enable for React/Vite apps using client-side history routes. Adds a Cloudflare Pages fallback to index.html. Leave false for traditional multi-page static sites.'),
   domain: domainSchema.optional().describe('Optional custom domain to bind after deployment, for example www.example.com. Omit if you do not own a domain; the pages.dev URL is ready to use.')
-}, async ({ project_name, dir_path, branch, spa_mode, domain }) => {
+}, { title: 'Deploy to Cloudflare Pages', readOnlyHint: false, destructiveHint: true, openWorldHint: true }, async ({ project_name, dir_path, branch, spa_mode, domain }) => {
   try {
     const client = new CloudflareClient();
     const result = await client.deploy(project_name, dir_path, branch, { spaMode: spa_mode });
@@ -35,7 +35,7 @@ server.tool('deploy_to_cloudflare_pages', 'Deploy a static website to Cloudflare
 server.tool('attach_custom_domain', 'Bind a custom domain to a Cloudflare Pages project and create a CNAME in a matching Cloudflare DNS zone when available.', {
   project_name: projectNameSchema.describe('Target Cloudflare Pages project name.'),
   domain: domainSchema.describe('Fully qualified custom domain, for example app.example.com.')
-}, async ({ project_name, domain }) => {
+}, { title: 'Attach a custom domain', readOnlyHint: false, destructiveHint: true, openWorldHint: true }, async ({ project_name, domain }) => {
   try {
     const result = await new CloudflareClient().attachDomain(project_name, domain);
     return { content: [{ type: 'text', text: `## Custom domain\n\n- Domain: ${domain}\n- Pages project: ${result.projectUrl}\n- Pages status: ${result.domainStatus}\n- SSL status: ${result.sslStatus}\n- DNS: ${result.dnsAction}${result.zone ? `\n- Cloudflare zone: ${result.zone}` : ''}` }] };
@@ -44,7 +44,7 @@ server.tool('attach_custom_domain', 'Bind a custom domain to a Cloudflare Pages 
 
 server.tool('list_deployments', 'List recent Cloudflare Pages deployments, live URLs, and custom domain bindings. Cloudflare Pages deployments support nested static assets and React/Vite builds.', {
   project_name: projectNameSchema.describe('Cloudflare Pages project name.')
-}, async ({ project_name }) => {
+}, { title: 'List Pages deployments', readOnlyHint: true, destructiveHint: false, openWorldHint: true }, async ({ project_name }) => {
   try {
     const result = await new CloudflareClient().listProject(project_name);
     const deployments = result.deployments.length ? result.deployments.map(item => `- ${item.created_on ?? 'Time unknown'} — ${item.latest_stage?.status ?? 'status unknown'} — ${item.url ? `https://${item.url.replace(/^https?:\/\//, '')}` : item.id} (${item.environment ?? 'environment unknown'})`).join('\n') : '- No deployments found.';

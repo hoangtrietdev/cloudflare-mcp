@@ -76,6 +76,13 @@ function safeError(error: unknown) {
   return error.message.replace(/Bearer\s+[A-Za-z0-9._~+/-]+/gi, 'Bearer [redacted]').slice(0, 1200);
 }
 
+function isPrivateOrBuildMetadata(asset: string): boolean {
+  const name = path.posix.basename(asset).toLowerCase();
+  return /(^|\/)(?:\.env(?:\.[^/]*)?|\.git|\.github|\.vercel|\.wrangler|node_modules)(?:\/|$)/i.test(asset)
+    || ['.npmrc', '.netrc', 'id_rsa', 'id_ed25519'].includes(name)
+    || /\.(?:pem|key|p12|pfx)$/i.test(name);
+}
+
 async function downloadBuild(repoUrl: string, branch: string, outputDir: string): Promise<string> {
   let url: URL;
   try { url = new URL(repoUrl); } catch { throw new Error('repo_url must be a public GitHub repository URL.'); }
@@ -115,7 +122,7 @@ async function downloadBuild(repoUrl: string, branch: string, outputDir: string)
     const prefix = selectedDir ? `${selectedDir}/` : '';
     if (!relative.startsWith(prefix)) return;
     const asset = relative.slice(prefix.length);
-    if (!asset || /(^|\/)\.(?:env|git|github)(?:\/|$)/i.test(asset)) return;
+    if (!asset || isPrivateOrBuildMetadata(asset)) return;
     if (count > MAX_FILES + 10_000) { problem = new Error('This archive contains too many files.'); return; }
     if (file.originalSize === undefined || file.originalSize > MAX_FILE_BYTES) { problem = new Error(`Build asset exceeds the 10 MiB online per-file limit: ${asset}`); return; }
     expanded += file.originalSize;

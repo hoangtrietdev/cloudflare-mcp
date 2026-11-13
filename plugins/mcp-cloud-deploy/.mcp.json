@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "mcp-cloud-deploy": {
+      "type": "http",
+      "url": "https://cloudflare-mcp-rho.vercel.app/api/mcp"
+    }
+  }
+}

@@ -26,6 +26,10 @@ test('starts over stdio and exposes the three deployment tools', async () => {
     const deploy = tools.find((tool) => tool.name === 'deploy_to_cloudflare_pages');
     assert.ok(deploy.inputSchema.properties.spa_mode);
     assert.ok(deploy.inputSchema.properties.domain);
+    assert.equal(deploy.annotations.readOnlyHint, false);
+    assert.equal(deploy.annotations.destructiveHint, true);
+    const list = tools.find((tool) => tool.name === 'list_deployments');
+    assert.equal(list.annotations.readOnlyHint, true);
   } finally {
     await client.close();
   }

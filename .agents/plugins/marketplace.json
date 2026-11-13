@@ -1,0 +1,20 @@
+{
+  "name": "hoangtrietdev-cloud-deploy",
+  "interface": {
+    "displayName": "MCP Cloud Deploy"
+  },
+  "plugins": [
+    {
+      "name": "mcp-cloud-deploy",
+      "source": {
+        "source": "local",
+        "path": "./plugins/mcp-cloud-deploy"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}

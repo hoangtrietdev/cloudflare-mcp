@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#07111f">
+  <meta name="description" content="A compact deployment check for mcp-cloud-deploy on Cloudflare Pages.">
+  <title>MyTestApp — Deployment check</title>
+  <link rel="icon" href="/assets/mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/site.css">
+  <script src="/assets/app.js" defer></script>
+</head>
+<body>
+  <main class="shell">
+    <nav class="nav"><a class="brand" href="/"><img src="/assets/mark.svg" alt="" width="34" height="34"> MyTestApp</a><span class="badge"><i></i> Cloudflare Pages test</span></nav>
+    <section class="hero">
+      <div class="copy">
+        <p class="eyebrow">STATIC DEPLOYMENT · VERIFIED ASSETS</p>
+        <h1>Your next idea<br><span>starts here.</span></h1>
+        <p class="lede">A small, polished landing page published with mcp-cloud-deploy. This page checks the HTML entry point, stylesheet, script, and nested SVG asset in one deployment.</p>
+        <div class="buttons"><a class="button primary" href="#details">Explore the demo <span aria-hidden="true">→</span></a><button class="button secondary" id="check">Run browser check</button></div>
+        <p class="result" id="result" aria-live="polite">All assets are ready to verify.</p>
+      </div>
+      <aside class="preview"><img src="/assets/mark.svg" alt="Blue geometric MyTestApp symbol" width="72" height="72"><p class="preview-label">DEPLOYMENT STATUS</p><h2>Live on Pages</h2><div class="rule"></div><div class="meta"><span>Project</span><strong>mytestapp</strong></div><div class="meta"><span>Delivery</span><strong>Static assets</strong></div><div class="meta"><span>Routing</span><strong>HTTPS · global edge</strong></div></aside>
+    </section>
+    <section class="features" id="details"><article><span>01</span><h3>Fast by default</h3><p>Static files served close to your visitors at the edge.</p></article><article><span>02</span><h3>Assets included</h3><p>Nested styles, scripts and icons are deployed with the page.</p></article><article><span>03</span><h3>Ready to grow</h3><p>Connect your own domain whenever the project is ready.</p></article></section>
+    <footer>Built as a deployment smoke-test · <a href="https://github.com/hoangtrietdev/cloudflare-mcp">mcp-cloud-deploy</a></footer>
+  </main>
+</body>
+</html>

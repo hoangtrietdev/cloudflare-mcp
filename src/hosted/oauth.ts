@@ -1,6 +1,7 @@
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 import { getPublicOrigin } from 'mcp-handler';
 import { CloudflareClient } from '../services/cloudflare.js';
+import { verifyCloudflareApiToken } from './cloudflare-auth.js';
 import { oauthDb, opaqueToken, seal, tokenHash, unseal, type CloudflareCredentials, type OAuthClient, type OAuthGrant } from './oauth-store.js';
 
 const ACCESS_TTL = 60 * 60;
@@ -21,14 +22,18 @@ export async function discovery(request: Request): Promise<Response> {
 export async function registerClient(request: Request): Promise<Response> {
   try {
     const input = await request.json() as Partial<OAuthClient>;
-    if (!Array.isArray(input.redirect_uris) || input.redirect_uris.length < 1 || input.redirect_uris.length > 20 || input.redirect_uris.some(uri => !safeRedirect(uri))) return error('redirect_uris must contain HTTPS or loopback callback URLs.');
+    if (!Array.isArray(input.redirect_uris) || input.redirect_uris.length < 1 || input.redirect_uris.length > 20 || input.redirect_uris.some(uri => typeof uri !== 'string' || uri.length > 2048 || !safeRedirect(uri)) || new Set(input.redirect_uris).size !== input.redirect_uris.length) return error('redirect_uris must contain unique HTTPS or loopback callback URLs (maximum 2,048 characters each).');
     const client: OAuthClient = { client_id: opaqueToken(), client_name: typeof input.client_name === 'string' ? input.client_name.slice(0, 120) : 'MCP client', redirect_uris: input.redirect_uris, token_endpoint_auth_method: 'none' };
     await oauthDb.put(`oauth:client:${client.client_id}`, client, 60 * 60 * 24 * 365);
     return json({ ...client, grant_types: ['authorization_code', 'refresh_token'], response_types: ['code'], client_id_issued_at: Math.floor(Date.now()/1000), client_secret_expires_at: 0 }, 201);
   } catch { return redisFailure(); }
 }
-function safeRedirect(input: string): boolean {
-  try { const url = new URL(input); return url.protocol === 'https:' || (['http:'].includes(url.protocol) && ['localhost','127.0.0.1','[::1]'].includes(url.hostname)); } catch { return false; }
+export function safeRedirect(input: string): boolean {
+  try {
+    const url = new URL(input);
+    if (url.username || url.password || url.hash) return false;
+    return url.protocol === 'https:' || (url.protocol === 'http:' && ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname));
+  } catch { return false; }
 }
 type AuthTxn = { client: OAuthClient; redirectUri: string; state: string; challenge: string; scope: string; resource: string; nonce: string };
 export async function authorize(request: Request): Promise<Response> {
@@ -40,22 +45,22 @@ export async function authorize(request: Request): Promise<Response> {
   const responseType = url.searchParams.get('response_type');
   const scope = url.searchParams.get('scope') ?? 'mcp:write';
   const resource = url.searchParams.get('resource') ?? `${origin(request)}/api/mcp`;
+  let resourceUrl: URL;
+  try { resourceUrl = new URL(resource); }
+  catch { return error('OAuth authorization request is invalid. Reconnect the MCP client.', 400); }
   try {
     const client = await oauthDb.get<OAuthClient>(`oauth:client:${clientId}`);
-    const resourceUrl = new URL(resource);
-    if (!client || responseType !== 'code' || !client.redirect_uris.includes(redirectUri) || !safeRedirect(redirectUri) || !/^[A-Za-z0-9_-]{43,128}$/.test(challenge) || !state || !scope.split(' ').includes('mcp:write') || resourceUrl.origin !== origin(request) || resourceUrl.pathname !== '/api/mcp') return error('OAuth authorization request is invalid. Reconnect the MCP client.', 400);
+    if (!client || responseType !== 'code' || !client.redirect_uris.includes(redirectUri) || !safeRedirect(redirectUri) || !/^[A-Za-z0-9_-]{43,128}$/.test(challenge) || !state || state.length > 1024 || !scope.split(' ').includes('mcp:write') || resourceUrl.origin !== origin(request) || resourceUrl.pathname !== '/api/mcp') return error('OAuth authorization request is invalid. Reconnect the MCP client.', 400);
     const handle = opaqueToken();
     const txn: AuthTxn = { client, redirectUri, state, challenge, scope: 'mcp:write', resource, nonce: opaqueToken() };
     await oauthDb.put(`oauth:txn:${handle}`, txn, 600);
     return html(`<p class="muted">Kết nối MCP · Cloudflare</p><h1>Cấp quyền cho ${esc(client.client_name ?? 'MCP client')}</h1><p>Client callback: <b>${esc(new URL(redirectUri).host)}</b>. Nhập Cloudflare Account ID và API Token riêng của bạn. Token giới hạn quyền trong tài khoản/zone bạn cấp.</p><p class="scope">Yêu cầu: Cloudflare Pages Edit để deploy. Thêm Zone Read và DNS Edit chỉ khi muốn tự tạo DNS record.</p><p class="warning"><b>Bảo mật:</b> thông tin được gửi qua HTTPS và mã hóa trong kho OAuth để thực hiện yêu cầu của bạn. Không dùng Global API Key. Thu hồi grant hoặc Cloudflare API Token bất cứ lúc nào.</p><form method="post" action="/oauth/authorize"><input type="hidden" name="handle" value="${esc(handle)}"><div class="field"><label for="account_id">Cloudflare Account ID</label><input id="account_id" name="account_id" required pattern="[A-Fa-f0-9]{32}" autocomplete="off"></div><div class="field"><label for="api_token">Cloudflare API Token</label><input id="api_token" name="api_token" type="password" required autocomplete="new-password"></div><div class="actions"><button name="decision" value="allow">Xác minh và kết nối</button><button class="deny" name="decision" value="deny" formnovalidate>Hủy</button></div></form>`);
   } catch { return redisFailure(); }
 }
-async function validateCredentials(accountId: string, apiToken: string) {
+export async function validateCredentials(accountId: string, apiToken: string) {
   if (!/^[a-f0-9]{32}$/i.test(accountId)) throw new Error('Account ID phải có đúng 32 ký tự hexadecimal.');
   if (apiToken.length < 20 || apiToken.length > 4096 || /\s/.test(apiToken)) throw new Error('API Token không đúng định dạng.');
-  const response = await fetch('https://api.cloudflare.com/client/v4/user/tokens/verify', { headers: { Authorization: `Bearer ${apiToken}` }, signal: AbortSignal.timeout(12_000) });
-  const data = await response.json().catch(() => null) as { success?: boolean; result?: { status?: string } } | null;
-  if (!response.ok || data?.success !== true || data.result?.status !== 'active') throw new Error('Cloudflare không xác nhận được token. Kiểm tra token còn hiệu lực và thử lại.');
+  await verifyCloudflareApiToken(accountId, apiToken);
   const client = new CloudflareClient(apiToken, accountId);
   try { await client.listProject('__mcp_permission_probe__'); }
   catch (err) {
@@ -122,7 +127,7 @@ export async function token(request: Request): Promise<Response> {
       const id = await oauthDb.get<string>(key); if (!id) return error('invalid_grant', 400);
       const grant = await oauthDb.get<OAuthGrant>(`oauth:grant:${id}`);
       if (!grant || grant.clientId !== clientId) return error('invalid_grant', 400);
-      await oauthDb.del(key);
+      if (await oauthDb.consume<string>(key) !== id) return error('invalid_grant', 400);
       const access = opaqueToken(); const nextRefresh = opaqueToken();
       await oauthDb.put(`oauth:grant:${id}`, grant, REFRESH_TTL);
       await oauthDb.put(`oauth:access:${tokenHash(access)}`, id, ACCESS_TTL);

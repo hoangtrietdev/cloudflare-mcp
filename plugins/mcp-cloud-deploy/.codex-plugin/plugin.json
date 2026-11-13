@@ -1,0 +1,35 @@
+{
+  "name": "mcp-cloud-deploy",
+  "version": "1.0.0",
+  "description": "Deploy static websites and single-page apps to Cloudflare Pages from chat.",
+  "author": {
+    "name": "hoangtrietdev",
+    "url": "https://github.com/hoangtrietdev"
+  },
+  "homepage": "https://cloudflare-mcp-rho.vercel.app",
+  "repository": "https://github.com/hoangtrietdev/cloudflare-mcp",
+  "license": "MIT",
+  "keywords": ["cloudflare-pages", "deployment", "static-site", "spa", "hosting"],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "MCP Cloud Deploy",
+    "shortDescription": "Deploy sites to Cloudflare",
+    "longDescription": "MCP Cloud Deploy publishes static websites and client-rendered single-page apps (React, Vite, Vue, Svelte and similar) to Cloudflare Pages from a conversation.\n\nWhat it does:\n- Deploys prebuilt output (dist, build, out) from a public GitHub repository to a Cloudflare Pages project, creating the project when needed and preserving nested images, fonts, CSS and JavaScript.\n- Enables SPA fallback so client-side routes work.\n- Attaches a custom domain you own and creates the CNAME automatically when the DNS zone is in the same Cloudflare account; otherwise it returns the exact record to add at your DNS provider.\n- Lists recent deployments, URLs and domain bindings.\n\nWho it is for: developers, designers and small businesses who want a site live on a free pages.dev address in minutes.\n\nAuthentication: OAuth. On the consent page you enter your own Cloudflare Account ID and a scoped API token (Cloudflare Pages Edit; Zone Read and DNS Edit only for automatic DNS). Credentials are encrypted with AES-256-GCM before storage and never returned in tool output.\n\nLimitations: the hosted service does not run build scripts, so the repository must be public and already contain the built output. It does not host server-side rendering or backend APIs. Limits: 20 MiB compressed archive, 50 MiB extracted output, 10 MiB per file, 20,000 files.",
+    "developerName": "hoangtrietdev",
+    "category": "Developer Tools",
+    "capabilities": [],
+    "websiteURL": "https://cloudflare-mcp-rho.vercel.app",
+    "supportURL": "https://github.com/hoangtrietdev/cloudflare-mcp/issues",
+    "privacyPolicyURL": "https://cloudflare-mcp-rho.vercel.app/privacy",
+    "termsOfServiceURL": "https://cloudflare-mcp-rho.vercel.app/terms",
+    "logo": "./assets/icon.svg",
+    "composerIcon": "./assets/icon.svg",
+    "brandColor": "#17231C",
+    "defaultPrompt": [
+      "Deploy the dist folder of my public GitHub repo to Cloudflare Pages as mystore",
+      "Attach www.example.com to my Pages project mystore",
+      "List my recent Cloudflare Pages deployments"
+    ]
+  }
+}

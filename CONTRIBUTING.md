@@ -10,7 +10,7 @@ Thanks for helping improve `mcp-cloud-deploy`.
 
 ## Local development
 
-Requirements: Node.js 18+ and npm.
+Requirements: Node.js 22+ and npm. Node.js 18 reached end of life in April 2025; the project tests supported Node.js LTS lines in CI.
 
 ```bash
 npm ci

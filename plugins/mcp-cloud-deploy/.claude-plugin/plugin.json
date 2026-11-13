@@ -1,0 +1,14 @@
+{
+  "name": "mcp-cloud-deploy",
+  "displayName": "MCP Cloud Deploy",
+  "version": "1.0.0",
+  "description": "Deploy static websites and single-page apps to Cloudflare Pages from chat, attach custom domains and check deployment status.",
+  "author": {
+    "name": "hoangtrietdev",
+    "url": "https://github.com/hoangtrietdev"
+  },
+  "homepage": "https://cloudflare-mcp-rho.vercel.app",
+  "repository": "https://github.com/hoangtrietdev/cloudflare-mcp",
+  "license": "MIT",
+  "keywords": ["cloudflare-pages", "deployment", "static-site", "spa", "hosting", "custom-domain"]
+}

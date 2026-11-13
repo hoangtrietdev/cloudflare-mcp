@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#fff7f3">
+  <meta name="description" content="Một lời mời đi date nhỏ xíu dành cho người thương. Chọn thứ Sáu hoặc thứ Bảy tuần này nhé!">
+  <title>Mình đi date nha? ♡</title>
+  <link rel="icon" href="/assets/heart.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/style.css">
+  <script src="/assets/app.js" defer></script>
+</head>
+<body>
+  <div class="page-wrap">
+    <header class="topbar">
+      <a class="brand" href="#top" aria-label="Một lời mời hẹn hò"><span class="brand-mark" aria-hidden="true">♡</span><span>một chiếc hẹn hò</span></a>
+      <span class="top-note"><span class="sparkle" aria-hidden="true">✦</span> lời mời dành riêng cho em</span>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span> THÔNG BÁO QUAN TRỌNG TỪ NGƯỜI THƯƠNG</p>
+          <h1 id="hero-title">Cuối tuần này,<br><span>mình đi date nha?</span></h1>
+          <p class="intro">Anh đã chuẩn bị một buổi hẹn thật vui, còn ngày nào thì để em chọn nè. Em chỉ cần chọn một ngày thôi, phần háo hức cứ để anh lo! ♡</p>
+
+          <section class="picker" id="picker" aria-labelledby="picker-title">
+            <div class="picker-heading">
+              <div><p class="mini-label">LỊCH HẸN CỦA TỤI MÌNH</p><h2 id="picker-title">Em rảnh hôm nào?</h2></div>
+              <span class="week-badge">TUẦN NÀY</span>
+            </div>
+            <div class="choices" role="radiogroup" aria-labelledby="picker-title">
+              <button class="choice" type="button" role="radio" aria-checked="false" data-day="friday">
+                <span class="choice-art art-sun" aria-hidden="true"><svg viewBox="0 0 44 44" fill="none"><circle cx="22" cy="22" r="8" fill="currentColor"/><path d="M22 3v5m0 28v5M3 22h5m28 0h5M8.6 8.6l3.5 3.5m19.8 19.8 3.5 3.5m0-26.8-3.5 3.5m-19.8 19.8-3.5 3.5" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg></span>
+                <span class="choice-copy"><span class="day-name" data-date="friday-name">Thứ Sáu</span><span class="date-label" data-date="friday-date">13 tháng 11</span><span class="day-caption">Date chiều tối nè</span></span>
+                <span class="radio-dot" aria-hidden="true"></span>
+              </button>
+              <button class="choice" type="button" role="radio" aria-checked="false" data-day="saturday">
+                <span class="choice-art art-moon" aria-hidden="true"><svg viewBox="0 0 44 44" fill="none"><path d="M34 28.3A16.8 16.8 0 0 1 15.7 10a16.8 16.8 0 1 0 18.3 18.3Z" fill="currentColor"/><path d="m31 7 1.3 3.2L35.5 11l-3.2 1.3L31 15.5l-1.3-3.2-3.2-1.3 3.2-.8L31 7Z" fill="currentColor"/></svg></span>
+                <span class="choice-copy"><span class="day-name" data-date="saturday-name">Thứ Bảy</span><span class="date-label" data-date="saturday-date">14 tháng 11</span><span class="day-caption">Cả ngày đều được á</span></span>
+                <span class="radio-dot" aria-hidden="true"></span>
+              </button>
+            </div>
+            <p class="helper" id="choice-help">Chọn ngày em thích nhất nha, không có đáp án sai đâu ♡</p>
+            <button class="submit" id="confirm" type="button" disabled>Chốt ngày hẹn với anh <span aria-hidden="true">→</span></button>
+          </section>
+        </div>
+
+        <aside class="art-card" aria-label="Hình minh họa hai bạn mèo đi hẹn hò">
+          <span class="floating-heart heart-one" aria-hidden="true">♡</span><span class="floating-heart heart-two" aria-hidden="true">♥</span><span class="floating-star star-one" aria-hidden="true">✦</span><span class="floating-star star-two" aria-hidden="true">✧</span>
+          <img class="date-art" src="/assets/cat-date.svg" alt="Hai bạn mèo hoạt hình đang ngồi cạnh nhau dưới bầu trời hồng" width="440" height="370">
+          <div class="art-caption"><span class="caption-icon" aria-hidden="true">♡</span><span><strong>Hai đứa mình</strong><small>và một buổi hẹn thật xinh</small></span><span class="caption-sparkle" aria-hidden="true">✦</span></div>
+        </aside>
+      </section>
+
+      <section class="thanks" id="thanks" hidden aria-live="polite" aria-labelledby="thanks-title">
+        <div class="thanks-art" aria-hidden="true"><span>♥</span><span>♡</span><span>✦</span></div>
+        <p class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span> HẸN HÒ ĐÃ ĐƯỢC ĐẶT LỊCH</p>
+        <h2 id="thanks-title">Yay, có hẹn với em rồi! <span aria-hidden="true">♡</span></h2>
+        <p class="chosen-date" id="chosen-date"></p>
+        <p class="love-message" id="love-message"></p>
+        <div class="thanks-actions"><button class="submit" id="share-message" type="button">Gửi lời nhắn này <span aria-hidden="true">↗</span></button><button class="edit-choice" id="edit-choice" type="button">Đổi ngày đã chọn</button></div>
+        <p class="tiny-note">Anh sẽ đợi em chọn địa điểm nha. Thương em nhiều! ♡</p>
+      </section>
+    </main>
+
+    <footer class="footer"><span>làm bằng một chút thương em <span aria-hidden="true">♡</span></span><span>hẹn em cuối tuần nhé!</span></footer>
+  </div>
+</body>
+</html>

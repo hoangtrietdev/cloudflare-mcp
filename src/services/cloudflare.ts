@@ -6,6 +6,15 @@ import { createPagesManifest, withSpaFallback } from '../assets.js';
 
 const API_BASE = 'https://api.cloudflare.com/client/v4';
 const MAX_ASSET_BYTES = 25 * 1024 * 1024;
+const MAX_TOTAL_ASSET_BYTES = 200 * 1024 * 1024;
+const MAX_ASSET_COUNT = 20_000;
+const SKIPPED_DIRECTORIES = new Set(['.git', '.vercel', '.wrangler', 'node_modules']);
+const SENSITIVE_FILE_NAMES = new Set(['.npmrc', '.netrc', 'id_rsa', 'id_ed25519']);
+
+function isSensitiveFile(relative: string): boolean {
+  const name = path.basename(relative).toLowerCase();
+  return name === '.env' || name.startsWith('.env.') || SENSITIVE_FILE_NAMES.has(name) || /\.(?:pem|key|p12|pfx)$/i.test(name);
+}
 
 type ApiEnvelope<T> = { success: boolean; result: T; errors?: Array<{ code?: number; message?: string }> };
 type PagesProject = { name: string; subdomain?: string; production_branch?: string };
@@ -77,6 +86,7 @@ export class CloudflareClient {
     if (!rootInfo.isDirectory()) throw new Error(`Build path is not a directory: ${root}`);
     const entries: Array<{ relative: string; bytes: Buffer; hash: string; contentType: string }> = [];
     const controlFiles = new Map<string, Buffer>();
+    let totalBytes = 0;
     const makeEntry = (relative: string, bytes: Buffer) => {
       const extension = path.extname(relative).slice(1);
       const hash = blake3Hash(`${bytes.toString('base64')}${extension}`).toString('hex').slice(0, 32);
@@ -87,14 +97,20 @@ export class CloudflareClient {
         if (entry.isSymbolicLink()) continue;
         const absolute = path.join(dir, entry.name);
         if (entry.isDirectory()) {
+          if (SKIPPED_DIRECTORIES.has(entry.name.toLowerCase())) continue;
           if (path.relative(root, absolute) === 'functions') {
             throw new Error('This MCP server deploys static build output only. It does not bundle Cloudflare Pages Functions or server-side code. Export a static build and pass that directory.');
           }
           await walk(absolute);
         } else if (entry.isFile()) {
-          const bytes = await readFile(absolute);
-          if (bytes.byteLength > MAX_ASSET_BYTES) throw new Error(`Asset exceeds the 25 MiB direct-upload limit: ${path.relative(root, absolute)}`);
           const relative = path.relative(root, absolute).split(path.sep).join('/');
+          if (isSensitiveFile(relative)) throw new Error('Refusing to deploy a file that may contain credentials: ' + relative + '. Remove it from the build output and deploy again.');
+          const info = await stat(absolute);
+          if (info.size > MAX_ASSET_BYTES) throw new Error('Asset exceeds the 25 MiB direct-upload limit: ' + relative);
+          totalBytes += info.size;
+          if (totalBytes > MAX_TOTAL_ASSET_BYTES) throw new Error('Build output exceeds the 200 MiB local deployment safety limit. Reduce the output or deploy smaller assets.');
+          if (entries.length + controlFiles.size >= MAX_ASSET_COUNT) throw new Error('Cloudflare Pages Direct Upload supports at most 20,000 files per deployment.');
+          const bytes = await readFile(absolute);
           if (['_redirects', '_headers', '_routes.json', '_worker.js'].includes(relative)) controlFiles.set(relative, bytes);
           else entries.push(makeEntry(relative, bytes));
         }
@@ -106,7 +122,6 @@ export class CloudflareClient {
       const existingRules = controlFiles.get('_redirects')?.toString('utf8');
       controlFiles.set('_redirects', Buffer.from(withSpaFallback(existingRules)));
     }
-    if (entries.length > 20_000) throw new Error('Cloudflare Pages Direct Upload supports at most 20,000 files per deployment.');
     const manifest = createPagesManifest(entries);
     const project = await this.ensureProject(projectName, branch);
     const unique = new Map<string, Buffer>();

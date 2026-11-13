@@ -25,7 +25,7 @@ The hosted app is a Next.js Node runtime using Vercel's `mcp-handler`, OAuth aut
 4. Wait for the production build to complete. The MCP endpoint is `https://<your-project>.vercel.app/api/mcp`.
 5. Put that endpoint into the landing page's `endpoint` constant before publishing its updated version. MCP clients use OAuth discovery and will open the Cloudflare consent page.
 
-Each user supplies their own Cloudflare Account ID and scoped API Token during OAuth. The hosted app encrypts those credentials with AES-256-GCM before writing them to Redis. **Do not copy the maintainer's `.env` Cloudflare token to GitHub or Vercel** for this per-user authorization flow; it is neither needed nor used by the hosted server. The local stdio server still uses `.env`.
+Each user supplies their own Cloudflare Account ID and scoped API Token during OAuth. The hosted app accepts user-owned tokens and `cfat_` account-owned tokens, verifies them against the appropriate Cloudflare token endpoint, and encrypts credentials with AES-256-GCM before writing them to Redis. **Do not copy the maintainer's `.env` Cloudflare token to GitHub or Vercel** for this per-user authorization flow; it is neither needed nor used by the hosted server. The local stdio server still uses `.env`.
 
 Vercel's Git integration builds and deploys each commit to the connected branch. The GitHub Actions CI checks Node.js compatibility and builds the web app; it does not need Cloudflare deployment credentials.
 
@@ -35,7 +35,7 @@ Use the full `/api/mcp` URL. Codex, VS Code, and JetBrains accept Streamable HTT
 
 ## Local install (stdio)
 
-Requirements: Node.js 18+, a Cloudflare account, and a scoped Cloudflare API Token.
+Requirements: Node.js 22+, a Cloudflare account, and a scoped Cloudflare API Token. Node.js 18 is end-of-life and is not supported.
 
 ```bash
 git clone https://github.com/hoangtrietdev/cloudflare-mcp.git
@@ -53,7 +53,7 @@ CLOUDFLARE_ACCOUNT_ID=your_cloudflare_account_id
 
 Build with `npm run build`. Configuration samples for Codex, VS Code, Claude Desktop, and JetBrains are in [`examples/configs/`](examples/configs/). They launch `scripts/start-local.mjs`, which loads `.env` and starts the MCP stdio server. Never put secrets in committed client config files.
 
-The local `deploy_to_cloudflare_pages` tool accepts `dir_path` such as `./dist`, `./build`, or `./out`; the folder must contain `index.html`. Nested images, fonts, CSS, and JavaScript are uploaded with the right paths. Set `spa_mode: true` for a React/Vite single-page app that uses client-side routing.
+The local `deploy_to_cloudflare_pages` tool accepts `dir_path` such as `./dist`, `./build`, or `./out`; the folder must contain `index.html`. Nested images, fonts, CSS, and JavaScript are uploaded with the right paths. It refuses known credential/private-key files, skips common repository/dependency metadata folders, and caps a local deployment at 200 MiB and 20,000 files. Set `spa_mode: true` for a React/Vite single-page app that uses client-side routing.
 
 ## Hosted tools
 
@@ -81,7 +81,7 @@ npm test
 npm run build:vercel
 ```
 
-CI validates the local MCP package on Node.js 18, 20, and 22 and builds the Vercel app on Node.js 22. Vercel production deployment is handled by the project’s Git integration.
+CI validates the local MCP package on Node.js 22 and 24, audits production dependencies, verifies the npm package contents, and builds the Vercel app. Vercel production deployment is handled by the project’s Git integration.
 
 ## Security and support
 
