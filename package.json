@@ -27,7 +27,7 @@
     "blake3-wasm": "^2.1.5",
     "dotenv": "^18.0.9",
     "fflate": "^0.8.3",
-    "mcp-handler": "^2.1.1",
+    "mcp-handler": "^2.4.0",
     "mime-types": "^3.0.2",
     "next": "^16.4.6",
     "react": "^19.3.1",
